@@ -38,11 +38,13 @@ const authRoutes = require('./routes/auth.routes');
 const chatRoutes = require('./routes/chat.routes');
 const messageRoutes = require('./routes/messages.routes');
 const setupSocketIO = require('./socketHandler');
+const userRoutes = require('./routes/user.routes');
 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/conversations', chatRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/users', userRoutes);
 
 
 app.get('/', (req, res) => res.send('Chat API is running 🚀'));
