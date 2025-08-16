@@ -1,38 +1,29 @@
+
 const mongoose = require('mongoose');
 
-
 const messageSchema = new mongoose.Schema({
-    
-    conversationId: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Conversation', 
-        required: true 
+    conversation: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Conversation',
+        required: true,
     },
-    
-    senderId: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true 
+    sender: { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     },
-    
-    content: {
+    text: {
         type: String,
-        required: [true, 'Message content cannot be empty'] 
+        required: [true, 'Message text cannot be empty'],
     },
-    
     readBy: [{
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User' 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     }],
-    
-    timestamp: {
-        type: Date,
-        default: Date.now 
-    }
+}, {
+    timestamps: true, 
 });
 
-
 const Message = mongoose.model('Message', messageSchema);
-
 
 module.exports = Message;
