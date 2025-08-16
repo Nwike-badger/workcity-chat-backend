@@ -2,6 +2,7 @@
 const express = require('express');
 const verifyToken = require('../middleware/auth.middleware');
 const Conversation = require('../model/Conversation');
+const Message = require('../model/Message');
 
 const router = express.Router();
 
@@ -64,6 +65,35 @@ router.post('/create', verifyToken, async (req, res) => {
       .populate('participants', 'email _id');
 
     res.status(201).json(populatedConversation);
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.delete('/:conversationId', verifyToken, async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.userId;
+
+    // Find the conversation to ensure the user is a participant
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      participants: userId, // Security check
+    });
+
+    if (!conversation) {
+      return res.status(403).json({ msg: 'Not authorized to delete this conversation.' });
+    }
+
+    // Step 1: Delete all messages within this conversation
+    await Message.deleteMany({ conversation: conversationId });
+
+    // Step 2: Delete the conversation itself
+    await Conversation.findByIdAndDelete(conversationId);
+
+    res.json({ msg: 'Conversation and all its messages have been deleted.' });
 
   } catch (err) {
     console.error(err.message);

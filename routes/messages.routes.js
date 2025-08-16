@@ -33,4 +33,35 @@ router.get('/:conversationId', verifyToken, async (req, res) => {
   }
 });
 
+router.delete('/:messageId', verifyToken, async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const userId = req.userId;
+
+    // Find the message
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ msg: 'Message not found.' });
+    }
+
+    // Security check: Ensure the user deleting the message is the original sender
+    if (message.sender.toString() !== userId) {
+      return res.status(403).json({ msg: 'You are not authorized to delete this message.' });
+    }
+
+    // Delete the message
+    await Message.findByIdAndDelete(messageId);
+
+    // Optional: You might want to update the 'lastMessage' in the conversation if this was it.
+    // This part can be complex, so we'll omit it for now for simplicity, but it's something to consider.
+
+    res.json({ msg: 'Message deleted successfully.' });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
